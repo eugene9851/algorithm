@@ -8,13 +8,38 @@
 
 quiz=["3 - 4 = -3", "5 + 6 = 11"]
 
+// function solution(quiz) {
+//   let answer = []
+//   quiz.forEach((exp) => {
+//     let [X, op, Y, eq, Z] = exp.split(' ')
+//     if(op=='-') Number(X)-Number(Y)==Number(Z) ? answer.push('O') : answer.push('X')
+//     else if(op=='+') Number(X)+Number(Y)==Number(Z) ? answer.push('O') : answer.push('X')
+//   })
+//   return answer
+// }
+//리팩토링 1. 변수 이름 설정할 때 어떤 변수를 지칭하는지 명확히 할 수 있는 이름으로 설정하기
+//리팩토링 2. 되도록이면 const사용
+//리팩토링 3. 되도록이면 일치 연산자 사용
+//리팩토링 3. Number형으로 형변환을 해야 한다면, 한 번만 수행하도록.
+//리팩토링 4. let answer = [] ... return answer => quiz.map 메소드 사용하기
+//리팩토링 5. 삼항연산자는 최대한 단순하게
+
 function solution(quiz) {
-  let answer = []
-  quiz.forEach((exp) => {
-    let [X, op, Y, eq, Z] = exp.split(' ')
-    if(op=='-') Number(X)-Number(Y)==Number(Z) ? answer.push('O') : answer.push('X')
-    else if(op=='+') Number(X)+Number(Y)==Number(Z) ? answer.push('O') : answer.push('X')
+  quiz.map((expression) => {
+    const [operand1, operator, operand2, equal, result] = expression.split(' ')
+
+    const numOperand1 = Number(operand1)
+    const numOperand2 = Number(operand2)
+    const numResult = Number(result)
+
+    let isCorrect = true;
+    if(operator === '-') {
+      isCorrect = numOperand1 - numOperand2 === numResult
+    } else if(operator === '+') {
+      isCorrect = numOperand1 + numOperand2 === numResult
+    }
+    return isCorrect ? "'O'" : "'X'"
   })
-  return answer
 }
+// solution(quiz)
 console.log(solution(quiz))
