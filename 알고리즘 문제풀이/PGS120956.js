@@ -1,3 +1,5 @@
+//재귀함수 사용하여 풀이
+
 const babblingObj = {
   'a' : 'aya',
   'y' : 'ye',
