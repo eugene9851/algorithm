@@ -5,10 +5,6 @@
 //board[row, column]=='1'인 값 각각에 대해 board[row+nrow, column+ncolumn] =='1'
 //board에서 '0'의 개수 리턴
 
-
-
-board = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 0, 0]]
-
 // function solution(board) {
 //   let count = 0
 //   let n = board[0].length
@@ -110,4 +106,45 @@ board = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0,
 //   }
 //   return n*n - count
 // }
+
+//리팩토링1 : for, if문은 최대 3중까지 권장. 반복문 분리할 수 있으면 분리하기!
+//리팩토링2 : 하나의 결과를 반환하는 로직은 새로운 함수를 만들어보는 것도 좋은 방법
+//리팩토링3 : 안전지대 유형 푸는 법 두 가지
+//          1) board에다가 위험지대 그려나가기
+//          2) 새로운 board를 만들고 위험지대 그려나가기
+//리팩토링4 : new Array *****
+
+function solution(board) {
+  let n = board.length
+  let map = new Array(board.length).fill(null).map(() => new Array(board[0].length).fill(0));
+  // let map = new Array(n).fill(new Array(n).fill(0))
+
+  for(let i=0; i<n; i++) {
+    for(let j=0; j<n; j++) {
+      if(board[i][j]===1) danger(i,j,map)
+    }
+  }
+
+  let count=0
+  for(let array of map) {
+    for(let value of array) {
+      if(value===0) count++
+    }
+  }
+  return count
+}
+
+const aroundX = [-1,-1,-1,0,0,0,1,1,1]
+const aroundY = [-1,0,1,-1,0,1,-1,0,1]
+
+function danger(x,y,checkBoard) {
+  for(let i=0; i<9; i++) {
+    let dangerX = x+aroundX[i]
+    let dangerY = y+aroundY[i]
+
+    if(dangerX>=0 && dangerX<checkBoard.length && dangerY>=0 && dangerY<checkBoard.length) checkBoard[dangerX][dangerY] = 1
+  }
+}
+
+board = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 0, 0]]
 console.log(solution(board))
