@@ -1,0 +1,23 @@
+function findAlphabet(map, alphabet) {
+  let min = Infinity;
+
+  map.forEach((keyPad) => {
+    if (keyPad.split("").indexOf(alphabet) === -1) return;
+    min = Math.min(min, keyPad.split("").indexOf(alphabet) + 1);
+  });
+  return min !== Infinity ? min : -1;
+}
+
+function solution(keymap, targets) {
+  return targets.map((target) => {
+    let count = 0;
+    for (let i = 0; i < target.length; i++) {
+      count += findAlphabet(keymap, target[i]);
+    }
+    return count;
+  });
+}
+
+keymap = ["AA"];
+targets = ["B"];
+console.log(solution(keymap, targets));
