@@ -1,60 +1,52 @@
-//장애물이 있으면 true, 없으면 false
-function isObstacle(op, n, start, obstacles, xWidth, yHeight) {
-  switch(op) {
-    case 'E':
-      let obstaclesEMap = obstacles.map(([x, y]) => {
-        if(start[0] === x && start[1] < y && start[1] + n >= y && start[1] + n >= xWidth) return true
-        else return false
-      })
-      return (obstaclesEMap.includes("true"))
-    case 'W':
-      let obstaclesWMap = obstacles.map(([x, y]) => {
-        if(start[0] === x && start[1] > y && start[1] - n <= y && start[1] - n < 0) return true
-        else return false
-      })
-      return (obstaclesWMap.includes("true"))
-    case 'S':
-      let obstaclesSMap = obstacles.map(([x, y]) => {
-        if(start[1] === y && start[0] < x && start[0] + n >= x && start[0] + n >= yHeight) return true
-        else return false
-      })
-      return (obstaclesSMap.includes("true"))
-    case 'N':
-      let obstaclesNMap = obstacles.map(([x, y]) => {
-        if(start[1] === y && start[0] > x && start[0] - n <= x && start[0] - n < 0) return true
-        else return false
-      })
-      return (obstaclesNMap.includes("true"))
+function solution(park, routes) {
+  const [startRow, startCol] = findStart(park)
+  const [finalRow, finalCol] = move(startRow, startCol, routes, park)
+  return [finalRow, finalCol]
+}
+
+//시작 좌표 구하기
+function findStart(park) {
+  for(let row = 0; row < park.length; row++) {
+    const col = park[row].indexOf("S")
+    if(col !== -1) return [row, col]
   }
 }
 
-function solution(park, routes) {
-  //시작 위치, 장애물 위치
-  let start
-  let obstacles = []
-  const xWidth = park.length
-  const yHeight = park[0].length
-  for(let i = 0; i < park.length; i++) {
-    for(let j = 0; j < park[0].length; j++) {
-      if(park[i][j] === "S") start = [i, j]
-      if(park[i][j] === "X") obstacles.push([i, j])
-    }
-  }
+function move(row, col, routes, park) {
+  let currentRow = row
+  let currentCol = col
 
   routes.forEach((route) => {
-    let [op, n] = route.split(' ')
-    //op, n은 문자열. n은 숫자형으로 변환
-    numN = Number(n)
-
-    //route까지의 길에 장애물이 없으면 이동
-    if(!isObstacle(op, numN, start, obstacles, xWidth, yHeight)) {
-      if(op === 'E') start[1] += n
-      if(op === 'W') start[1] -= n
-      if(op === 'S') start[0] += n
-      if(op === 'N') start[0] -= n
+    const { nextRow, nextCol } = getNextPosition(currentRow, currentCol, route, park)
+    if(nextRow !== null) {
+      currentRow = nextRow
+      currentCol = nextCol
     }
   })
-  return start
+  return [currentRow, currentCol]
+}
+
+function getNextPosition(row, col, route, park) {
+  const [direction, steps] = route.split(" ")
+  let tempRow = row
+  let tempCol = col
+
+  for(let i = 0; i < Number(steps); i++) {
+    if(direction === "E") tempCol++
+    if(direction === "W") tempCol--
+    if(direction === "S") tempRow++
+    if(direction === "N") tempRow--
+
+    if(!isValid(tempRow, tempCol, park)) {
+      return { nextRow: null, nextCol: null }
+    }
+  }
+  return { nextRow: tempRow, nextCol: tempCol }
+}
+
+//범위 안에 있고, 장애물이 없으면 true return
+function isValid(row, col, park) {
+  return row >= 0 && col >= 0 && row < park.length && col < park[0].length && park[row][col] !== "X"
 }
 
 park = ["SOO", "OXX", "OOO"]
