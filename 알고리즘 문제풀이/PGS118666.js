@@ -9,33 +9,26 @@ function getTypeScore(survey, choice, obj) {
 
 //지표별 점수가 더 높은 성격유형 리턴
 function getType(obj, type1, type2) {
-  let type
-  if(obj[type1] === obj[type2]) type = type1
-  if(!obj[type1] && !obj[type2]) type = type1
-  if(!obj[type1] && obj[type2]) type = type2
-  if(obj[type1] && !obj[type2]) type = type1
-
-  if(obj[type1] > obj[type2]) type = type1
-  if(obj[type1] < obj[type2]) type = type2
-
-  return type
+  if(!obj[type1] && !obj[type2]) return type1
+  return obj[type1] >= (obj[type2] || 0) ? type1 : type2
 }
 
 function solution(survey, choices) {
   let typeScoreObj = {}
 
-  for(let i = 0; i < survey.length; i++) {
-    getTypeScore(survey[i], choices[i], typeScoreObj)
-  }
+  survey.forEach((types, index) => {
+    getTypeScore(types, choices[index], typeScoreObj)
+  })
 
-  const first = getType(typeScoreObj, 'R', 'T')
-  const second = getType(typeScoreObj, 'C', 'F')
-  const third = getType(typeScoreObj, 'J', 'M')
-  const fourth = getType(typeScoreObj, 'A', 'N')
+  const personalityTypes = [
+    ['R', 'T'], ['C', 'F'], ['J', 'M'], ['A', 'N']
+  ]
 
-  let answer = ""
-  answer += (first + second + third + fourth)
-  return answer
+  let result = personalityTypes.map((types) => {
+    return getType(typeScoreObj, ...types)
+  }).join('')
+
+  return result
 }
 
 survey = ["AN", "CF", "MJ", "RT", "NA"]
