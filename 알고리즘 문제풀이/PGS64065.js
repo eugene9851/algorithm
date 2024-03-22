@@ -1,22 +1,23 @@
 function solution(string) {
-  let stringArray = string.split('') //string 배열화
-  stringArray.splice(0, 2) //앞의 "{", "{" 제거
-  stringArray.splice(-2, 2) //뒤의 "}", "}" 제거
+  const tuples = string.slice(2, -2).split('},{') //앞뒤의 "{", "}" 제거
+
   //원소의 길이가 짧은 순서대로 재정렬
-  const sortedArray = stringArray.join('').split('},{').sort((a, b) => a.length - b.length)
-  //문자열 형태의 각 원소를 배열화
-  const tupleArray = sortedArray.map((tuple) => tuple.split(','))
+  const sortedTuples = tuples.map(tuple => tuple.split(',')).sort((a, b) => a.length - b.length)
 
   //result의 첫번째 값은 tupleArray의 첫 번째 값
-  let result = tupleArray[0]
+  let result = []
+  const seen = new Set()
 
-  //tupleArray에서 이전 배열에 없는 원소를 result에 push
-  for(let i = 1; i < tupleArray.length; i++) {
-    tupleArray[i].forEach((element) => {
-      if(!tupleArray[i - 1].includes(element)) result.push(element)
+  //중복 없이 순서대로 배열에 추가
+  sortedTuples.forEach(tuple => {
+    tuple.forEach(num => {
+      if(!seen.has(num)) {
+        seen.add(num)
+        result.push(parseInt(num, 10))
+      }
     })
-  }
-  return result.map(Number) //result의 원소들은 문자형이므로 숫자형으로 변환
+  })
+  return result
 }
 
 string = "{{1,2,3},{2,1},{1,2,4,3},{2}}"
