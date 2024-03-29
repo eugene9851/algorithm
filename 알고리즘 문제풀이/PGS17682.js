@@ -1,40 +1,31 @@
 function solution(dartResult) {
-  const dartScore = dartResult.split('')
-  const exp = /\d/ //0~9까지의 숫자 정규표현식
+  const pattern = /(\\d+)([SDT])([*#]?)/g
   //몇제곱할지 객체화
   const bonus = {
     'S': 1,
     'D': 2,
     'T': 3
   }
-  let currentScore = 0 //현재 score
-  let prevScore = 0 //직전 score
-  let totalScore = 0 //총점
+  let scores = [] //점수 저장할 배열. 나중에 다 더할 것
 
-  for(let i = 0; i < dartScore.length; i++) {
-    if(exp.test(+dartScore[i])) { //숫자일 때
-      let score = Number(dartScore[i])
-      //다음 요소도 숫자면 score = 10
-      if(exp.test(+dartScore[i]) && exp.test(+dartScore[i + 1])) {
-        score = 10
-        i++
-      }
-      //S, D, T에 따라 1제곱,2제곱,3제곱
-      currentScore = Math.pow(score, bonus[dartScore[i + 1]])
-      //#이 있으면 현재 점수*(-1)
-      if(dartScore[i + 2] === '#') currentScore *= (-1)
-      //*이 있으면 현재 점수*2, 직전 점수*2
-      if(dartScore[i + 2] === "*") {
-        prevScore *= 2
-        currentScore *= 2
-      }
-      totalScore += prevScore //총점에 이전 점수 더하기
-      prevScore = currentScore //현재 점수는 이전 점수가 됨
-      currentScore = 0 //현재 점수 초기화
+  dartResult.replace(pattern, (match, score, bonusType, option) => {
+    console.log(match)
+    let scoreValue = Math.pow(score, bonus[bonusType]) //S,D,T 계산
+
+    if(option === '*') {
+      if(scores.length) scores[scores.length - 1] *= 2 //이전 점수가 있으면 이전 점수*2
+      scoreValue *= 2 //현재 점수*2
     }
-  }
-  totalScore += prevScore //마지막까지 돌면 totalScore에 prevScore 마저 더하기
-  return totalScore
+
+    if(option === '#') {
+      scoreValue *= -1 //현재점수*(-1)
+    }
+
+    scores.push(scoreValue)
+  })
+
+  return scores.reduce((acc, score) => acc + score, 0)
 }
+
 dartResult = "1D2S#10S"
 console.log(solution(dartResult))
