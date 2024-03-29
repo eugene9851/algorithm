@@ -1,20 +1,34 @@
-//9.46~
-
 function solution(n, lost, reserve) {
-  lost.forEach((lostStudent) => { //도난당한 각 학생에 대해서
-    if(reserve.includes(lostStudent)) { //여벌 있는 학생 = 도난당한 학생
-      delete lost[lost.indexOf(lostStudent)]
-      delete reserve[reserve.indexOf(lostStudent)]
-    } else if(reserve.includes(lostStudent - 1)) { //도난 당한 학생 - 1 = 여벌 있는 학생
-      delete lost[lost.indexOf(lostStudent)]
-      delete reserve[reserve.indexOf(lostStudent - 1)]
-    } else if(reserve.includes(lostStudent + 1)) { //도난 당한 학생 + 1 = 여벌 있는 학생
-      delete lost[lost.indexOf(lostStudent)]
-      delete reserve[reserve.indexOf(lostStudent + 1)]
+  //여벌 있는 학생 = 도난당한 학생
+  lost = lost.filter((lostStudent) => {
+    const index = reserve.indexOf(lostStudent)
+    if(index !== -1) {
+      reserve.splice(index, 1) //여벌 목록에서 제거
+      return false //도난 목록에서 제거
     }
+    return true
   })
-  const filteredLost = lost.filter((lostStudent) => lostStudent !== undefined)
-  return n - filteredLost.length
+
+  lost.sort((a, b) => a - b)
+  reserve.sort((a, b) => a - b)
+
+  //체육복 빌려줄 수 있는 경우
+  for(let i = 0; i < lost.length; i++) {
+    const lostOne = lost[i]
+    const prevIndex = reserve.indexOf(lostOne - 1)
+    const nextIndex = reserve.indexOf(lostOne + 1)
+
+    if(prevIndex !== -1) {
+      reserve.splice(prevIndex, 1)
+      lost[i] = null //목록에서 체육복 빌린 사람 제거
+    } else if(nextIndex !== -1) {
+      reserve.splice(nextIndex, 1)
+      lost[i] = null
+    }
+  }
+
+  const actualLost = lost.filter(lostStudent => lostStudent !== null)
+  return n - actualLost.length
 }
 
 n = 5
