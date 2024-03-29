@@ -3,21 +3,30 @@ const getDays = (year, month, day) => {
   return day + month * 28 + year * 12 * 28
 }
 
-function solution(today, terms, privacies) {
-  const todayDays = getDays(...today.split('.').map(Number)) //오늘 -> 일 수
-  const dueDate = {}
+//날짜 문자열을 year, month, day 배열로 반환
+const parseDate = (dateString) => {
+  return dateString.split('.').map(Number)
+}
 
-  //type에 따른 유효 일 수
+//type에 따른 유효일 수 맵 객체로 반환
+const calculateDueDates = (terms) => {
+  const dueDates = new Map()
   terms.forEach(term => {
     const [type, dueMonth] = term.split(' ')
-    dueDate[type] = dueMonth * 28
+    dueDates.set(type, dueMonth * 28)
   })
+  return dueDates
+}
+
+function solution(today, terms, privacies) {
+  const todayDays = getDays(...parseDate(today)) //오늘 -> 일 수
+  const dueDates = calculateDueDates(terms)
 
   //개인정보 수집 날짜 + 유효기간 < 오늘 날짜 이면 리턴
   const resultMap = privacies.map((privacy, idx) => {
     const [privacyDate, privacyType] = privacy.split(' ')
-    const privacyDays = getDays(...privacyDate.split('.').map(Number))
-    const dueDays = privacyDays + dueDate[privacyType] - 1
+    const privacyDays = getDays(...parseDate(privacyDate))
+    const dueDays = privacyDays + dueDates.get(privacyType) - 1
 
     if(dueDays < todayDays) return idx + 1
   })
