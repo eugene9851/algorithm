@@ -1,39 +1,27 @@
 //files의 각 요소를 {index, head, number, tail}로 나누기
-function getFileObj(files) {
-  const exp = /\d/
-  return files.map((file, idx) => {
-    const fileArray = file.split('')
-    let fileObj = { index: idx }
-    for(let i = 0; i < fileArray.length; i++) {
-      if(exp.test(+fileArray[i])) {
-        fileObj.HEAD = fileArray.splice(0, i).join('').toLowerCase()
-        break
-      }
-    }
-    for(let i = 0; i < fileArray.length; i++) {
-      if(!exp.test(+fileArray[i])) {
-        fileObj.NUMBER = Number(fileArray.splice(0, i).join(''))
-        break
-      }
-    }
-    fileObj.TAIL = fileArray.join('')
-    return fileObj
-  })
+function parseFileName(file) {
+  const matchResult = file.match(/^([a-zA-Z\\s.-]+)(\d{1,5})(.*)$/)
+
+  return {
+    HEAD: matchResult[1].toLowerCase(),
+    NUMBER: parseInt(matchResult[2], 10),
+    TAIL: matchResult[3]
+  }
 }
+
 function solution(files) {
-  const fileObj = getFileObj(files)
+  const fileObjArray = files.map((file, idx) => ({ ...parseFileName(file), index: idx }))
   //head로 먼저 정렬, 같다면 number로 정렬
-  const sortedFileObj = fileObj.sort((a, b) => {
+  fileObjArray.sort((a, b) => {
     if(a.HEAD > b.HEAD) return 1;
     if(a.HEAD < b.HEAD) return -1;
-    if(a.HEAD = b.HEAD) {
-      if(a.NUMBER > b.NUMBER) return 1;
-      if(a.NUMBER < b.NUMBER) return -1;
-      return 0
-    }
-  })
+    if(a.NUMBER > b.NUMBER) return 1;
+    if(a.NUMBER < b.NUMBER) return -1;
+    return a.index - b.index //원래 순서 유지
+  }
+  )
   //정렬된 객체들의 index대로 리턴
-  return sortedFileObj.map((obj) => {
+  return fileObjArray.map((obj) => {
     return files[obj.index]
   })
 }
