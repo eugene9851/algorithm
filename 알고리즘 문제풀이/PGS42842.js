@@ -1,4 +1,4 @@
-//12.33
+//20min
 
 function solution(brown, yellow) {
   for(let i = 1; i <= yellow; i++) {
