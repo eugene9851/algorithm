@@ -1,4 +1,4 @@
-//30min
+//30min.
 
 function solution(n) {
   let answer = []
