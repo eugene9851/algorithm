@@ -1,70 +1,90 @@
-let input = require('fs').readFileSync('/dev/stdin').toString().split('\n');
+let input = require('fs').readFileSync('../example.txt').toString().split('\n');
 const n = Number(input[0])
 const commands = input.slice(1).map(v => v.split(' '))
 
-class Queue {
+class Node {
+    constructor(value) {
+        this.value = value
+        this.next = null
+        this.prev = null
+    }
+}
+
+class Deque {
     constructor() {
-        this.items = []
-        this.head = 0
+        this.head = null
+        this.tail = null
+        this.size = 0
     }
 
     empty() {
-        return this.items.length === this.head ? 1 : 0
+        return this.size === 0 ? 1 : 0
     }
 
     push(item) {
-        this.items.push(item)
+        const newNode = new Node(item)
+
+        if (this.empty()) {
+            this.head = newNode
+            this.tail = newNode
+        } else {
+            newNode.prev = this.tail
+            this.tail.next = newNode
+            this.tail = newNode
+        }
+
+        this.size++
     }
 
     pop() {
-        if (this.empty() === 1) return -1
+        if (this.empty()) return -1
 
-        const item = this.items[this.head]
-        this.head++
-
-        if (this.head > 100) {
-            this.items = this.items.slice(this.head)
-            this.head = 0
+        const removedValue = this.head.value
+        if (this.size === 1) {
+            this.head = null
+            this.tail = null
+        } else {
+            this.head = this.head.next
+            this.head.prev = null
         }
-        return item
-    }
 
-    size() {
-        return this.items.length - this.head
+        this.size--
+        return removedValue
     }
 
     front() {
-        if (this.empty() === 1) return -1
+        if (this.empty()) return -1
 
-        return this.items[this.head]
+        return this.head.value
     }
 
     back() {
-        if (this.empty() === 1) return -1
+        if (this.empty()) return -1
 
-        return this.items[this.items.length - 1]
+        return this.tail.value
     }
 }
 
 function solution(n, commands) {
-    const queue = new Queue()
+    const deque = new Deque()
     const result = []
 
     for (let i = 0; i < n; i++) {
+        console.log(deque)
         const [command, value] = commands[i]
 
         switch (command) {
-            case 'push': queue.push(value)
+            case 'push': deque.push(value)
                 break
-            case 'pop': result.push(queue.pop())
+            case 'pop': result.push(deque.pop())
                 break
-            case 'size': result.push(queue.size())
+            case 'size': result.push(deque.size)
                 break
-            case 'empty': result.push(queue.empty())
+            case 'empty': result.push(deque.empty())
                 break
-            case 'front': result.push(queue.front())
+            case 'front': result.push(deque.front())
                 break
-            case 'back': result.push(queue.back())
+            case 'back': result.push(deque.back())
                 break
             default: break
         }
