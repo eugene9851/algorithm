@@ -1,52 +1,51 @@
-//35min
+let input = require('fs').readFileSync('../example.txt').toString().trim().split('\n');
 
-let input = require('fs').readFileSync('../example.txt').toString().split('\n');
-
-const [total, n, v] = input[0].split(' ').map(Number)
-
-let graph = new Array(total + 1).fill(null).map(() => new Array(total + 1).fill(0))
-
-for(let i = 0; i < n; i++) {
-  const [start, end] = input[i + 1].split(' ').map(Number)
-  graph[start][end] = 1
-  graph[end][start] = 1
+const [n, m, start] = input[0].split(' ').map(Number)
+const graph = Array.from({ length: n + 1 }, () => [])
+for (let i = 1; i <= m; i++) {
+  const [a, b] = input[i].split(' ').map(Number)
+  graph[a].push(b)
+  graph[b].push(a)
 }
 
-let dfs_visited = new Array(total + 1).fill(0)
-let dfs_answer = []
+graph.forEach(arr => arr.sort((a, b) => a - b))
 
-function dfs(startNumber) {
-  dfs_visited[startNumber] = 1
-  dfs_answer.push(startNumber)
+const dfsVisited = new Array(n + 1).fill(false)
+const stack = []
 
-  for(let i = 1; i <= total; i++) {
-    if(graph[startNumber][i] === 1 && dfs_visited[i] === 0) dfs(i)
+function dfs(graph, start) {
+  stack.push(start)
+  dfsVisited[start] = true
+
+  for (let neighbor of graph[start]) {
+    if (!dfsVisited[neighbor]) {
+      dfs(graph, neighbor)
+    }
   }
+
+  return stack
 }
-dfs(v)
 
-let bfs_visited = new Array(total + 1).fill(0)
-let bfs_answer = []
+const bfsVisited = new Array(n + 1).fill(false)
+const order = []
 
-function bfs(startNumber) {
-  let queue = []
-  bfs_visited[startNumber] = 1
-  bfs_answer.push(startNumber)
-  queue.push(startNumber)
+function bfs(graph, start) {
+  const queue = [start]
+  bfsVisited[start] = true
 
-  while(queue.length !== 0) {
-    let dequeue = queue.shift()
-
-    for(let i = 1; i <= total; i++) {
-      if(graph[dequeue][i] === 1 && bfs_visited[i] === 0) {
-        bfs_visited[i] = 1
-        queue.push(i)
-        bfs_answer.push(i)
+  while (queue.length > 0) {
+    const node = queue.shift()
+    order.push(node)
+    for (let neighbor of graph[node]) {
+      if (!bfsVisited[neighbor]) {
+        bfsVisited[neighbor] = true
+        queue.push(neighbor)
       }
     }
   }
-}
-bfs(v)
 
-console.log(dfs_answer.join(' '))
-console.log(bfs_answer.join(' '))
+  return order
+}
+
+console.log(dfs(graph, start).join(' '))
+console.log(bfs(graph, start).join(' '))
