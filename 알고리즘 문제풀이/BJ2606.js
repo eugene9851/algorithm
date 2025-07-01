@@ -1,38 +1,34 @@
-//40min
-
 let input = require('fs').readFileSync('../example.txt').toString().split('\n');
 
-const [totalCom, connectedNum] = input.slice(0, 2).map(Number)
+const n = Number(input[0])
+const m = Number(input[1])
 
-function solution(totalCom, connectedNum) {
-  let answer = 0 //정답
-  //n번째에 연결되어있는 컴퓨터 번호 배열
-  let graph = new Array(totalCom + 1).fill(null).map(() => [])
-  let visited = new Array(totalCom + 1).fill(0)
+const graph = new Array(n + 1).fill(null).map(() => [])
 
-  //양방향
-  for(let i = 0; i < connectedNum; i++) {
-    const start = Number(input[i + 2].split(' ')[0])
-    const end = Number(input[i + 2].split(' ')[1])
+for (let i = 0; i < m; i++) {
+  const [a, b] = input[i + 2].split(' ').map(Number)
+  graph[a].push(b)
+  graph[b].push(a)
+}
 
-    graph[start].push(end)
-    graph[end].push(start)
-  }
+let count = 0
+const visited = new Array(n + 1).fill(false)
 
-  function dfs(start) {
-    for(let end of graph[start]) {
-      if(visited[end] === 0) {
-        answer++
-        visited[end] = 1
-        dfs(end)
+function bfs(graph, start) {
+  const queue = [start]
+  visited[start] = true
+
+  while (queue.length > 0) {
+    const node = queue.shift()
+    for (let neighbor of graph[node]) {
+      if (!visited[neighbor]) {
+        visited[neighbor] = true
+        queue.push(neighbor)
+        count++
       }
     }
   }
-
-  visited[1] = 1 // 시작지점 1 방문처리
-  dfs(1) //1에서 시작
-
-  return answer
+  return count
 }
 
-console.log(solution(totalCom, connectedNum))
+console.log(bfs(graph, 1))
