@@ -1,52 +1,68 @@
 let input = require('fs').readFileSync('../example.txt').toString().trim().split('\n');
 
-const n = Number(input[0]);
-const arr = input.slice(1).map(Number);
+const n = Number(input[0])
+const inputs = input.slice(1).map(Number)
 
-function solution(n, arr) {
-    const heap = []
+class MinHeap {
+    constructor() {
+        this.heap = []
+    }
+
+    push(value) {
+        this.heap.push(value)
+        let i=this.heap.length-1
+        while(i>0) {
+            const parent = Math.floor((i-1)/2)
+
+            if (this.heap[i] < this.heap[parent]) {
+                [this.heap[i], this.heap[parent]] = [this.heap[parent], this.heap[i]]
+                i = parent
+            } else break
+        }
+    }
+
+    pop() {
+        if (this.heap.length === 0) return 0
+        
+        const min = this.heap[0]
+        const last = this.heap.pop()
+
+        if (this.heap.length > 0) {
+            this.heap[0] = last
+            heapify(this.heap, this.heap.length, 0)
+        }
+
+        return min
+    }
+}
+
+function heapify(heap, n, i) {
+    let smallest = i
+    let left = i * 2 + 1
+    let right = i * 2 + 2
+
+    if (left < n && heap[smallest] > heap[left]) smallest = left
+    if (right < n && heap[smallest] > heap[right]) smallest = right
+    if (smallest !== i) {
+        [heap[smallest], heap[i]] = [heap[i], heap[smallest]]
+        heapify(heap, n, smallest)
+    }
+}
+
+function solution(n, inputs) {
+    let heap = new MinHeap()
     const result = []
 
-    for (let i = 0; i < n; i++) {
-        if (arr[i] === 0) {
+    for(let i=0; i<n; i++) {
+        if (inputs[i] === 0) {
             if (heap.length === 0) result.push(0)
-            else result.push(heapPop(heap))
-        } else {
-            heap.push(arr[i])
-            let idx = heap.length - 1
-            while (idx > 0) {
-                const parent = Math.floor((idx - 1) / 2)
-                if (heap[parent] > heap[idx]) {
-                    [heap[parent], heap[idx]] = [heap[idx], heap[parent]]
-                    idx = parent
-                } else break
-            }
+            result.push(heap.pop())
         }
+
+        else heap.push(inputs[i])
     }
 
     return result
 }
 
-function heapify(heap, n, i) {
-    let smallest = i
-    const left = 2 * i + 1
-    const right = 2 * i + 2
-
-    if (left < n && heap[left] < heap[smallest]) smallest = left
-    if (right < n && heap[right] < heap[smallest]) smallest = right
-    if (smallest !== i) {
-        [heap[i], heap[smallest]] = [heap[smallest], heap[i]]
-        heapify(heap, n, smallest)
-    }
-}
-function heapPop(heap) {
-    const min = heap[0]
-    const last = heap.pop()
-    if (heap.length > 0) {
-        heap[0] = last
-        heapify(heap, heap.length, 0)
-    }
-    return min
-}
-
-console.log(solution(n, arr).join('\n'))
+console.log(solution(n, inputs).join('\n'))
